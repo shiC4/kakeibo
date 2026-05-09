@@ -1,0 +1,642 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.2">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="ja"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1">&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1">&lt;title&gt;家計簿&lt;/title&gt;</p>
+<p class="p1">&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"&gt;&lt;/script&gt;</p>
+<p class="p1">&lt;style&gt;</p>
+<p class="p1">*{box-sizing:border-box;margin:0;padding:0}</p>
+<p class="p1">body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans',sans-serif;background:#f0f4f1;color:#1a2e1e;min-height:100vh;padding-bottom:80px}</p>
+<p class="p1">:root{--g1:#1e7a4a;--g2:#15603a;--acc:#25a05e;--acc-light:#e6f4ed;--acc-text:#1e7a4a;--fixed1:#2d6e4e;--fixed2:#1a4a34}</p>
+<p class="p2"><br></p>
+<p class="p1">.tab-bar{position:fixed;bottom:0;left:0;right:0;display:flex;background:#fff;border-top:1px solid #d6e8dc;z-index:100;padding:4px 0 8px}</p>
+<p class="p1">.tab-btn{flex:1;padding:6px 2px;border:none;background:none;color:#9ab0a0;font-size:9px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .2s}</p>
+<p class="p1">.tab-btn svg{width:21px;height:21px;stroke-width:1.8}</p>
+<p class="p1">.tab-btn.active{color:var(--g1)}</p>
+<p class="p1">.tab-icon{padding:2px 12px;transition:background .2s;border-radius:12px}</p>
+<p class="p1">.tab-btn.active .tab-icon{background:var(--acc-light)}</p>
+<p class="p2"><br></p>
+<p class="p1">.page{display:none;padding:16px 14px;max-width:480px;margin:0 auto}</p>
+<p class="p1">.page.active{display:block}</p>
+<p class="p1">.page-header{font-size:22px;font-weight:700;color:#1a2e1e;margin-bottom:16px;letter-spacing:-.5px}</p>
+<p class="p2"><br></p>
+<p class="p1">.card{background:#fff;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.06),0 0 0 1px rgba(0,0,0,.03);margin-bottom:14px;overflow:hidden}</p>
+<p class="p1">.card-header{padding:14px 16px 0;font-size:11px;font-weight:600;color:#7a9e86;letter-spacing:.5px;text-transform:uppercase}</p>
+<p class="p1">.card-body{padding:14px 16px}</p>
+<p class="p2"><br></p>
+<p class="p1">.grad-card{border-radius:16px;padding:20px;margin-bottom:14px;color:#fff;box-shadow:0 4px 14px rgba(30,122,74,.3)}</p>
+<p class="p1">.grad-card.green{background:linear-gradient(135deg,var(--g1),var(--g2))}</p>
+<p class="p1">.grad-card.teal{background:linear-gradient(135deg,var(--fixed1),var(--fixed2))}</p>
+<p class="p1">.grad-card .lbl{font-size:12px;opacity:.8;margin-bottom:4px;font-weight:500}</p>
+<p class="p1">.grad-card .big{font-size:38px;font-weight:700;letter-spacing:-1.5px;margin-bottom:14px}</p>
+<p class="p1">.grad-card .sub{display:flex;justify-content:space-around;padding-top:12px;border-top:1px solid rgba(255,255,255,.2)}</p>
+<p class="p1">.grad-card .sub-item{text-align:center}</p>
+<p class="p1">.grad-card .sub-item .sl{font-size:11px;opacity:.7;margin-bottom:3px}</p>
+<p class="p1">.grad-card .sub-item .sv{font-size:15px;font-weight:600}</p>
+<p class="p2"><br></p>
+<p class="p1">.month-selector{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;background:#fff;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06),0 0 0 1px rgba(0,0,0,.03);padding:10px 16px}</p>
+<p class="p1">.month-nav{background:none;border:none;cursor:pointer;color:var(--g1);padding:4px;display:flex;align-items:center;border-radius:8px}</p>
+<p class="p1">.month-nav svg{width:20px;height:20px;stroke-width:2.2}</p>
+<p class="p1">.month-label-btn{font-size:17px;font-weight:700;color:#1a2e1e;background:none;border:none;cursor:pointer;padding:4px 10px;border-radius:8px;border-bottom:2px solid var(--acc);line-height:1.3;transition:background .2s}</p>
+<p class="p1">.month-label-btn:hover{background:var(--acc-light)}</p>
+<p class="p2"><br></p>
+<p class="p1">.view-toggle{background:#f0f4f1;border:none;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;color:#4a7a58;font-weight:500}</p>
+<p class="p2"><br></p>
+<p class="p1">.entry-item{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #f0f4f1}</p>
+<p class="p1">.entry-item:last-child{border-bottom:none}</p>
+<p class="p1">.cat-badge{font-size:10px;padding:3px 8px;border-radius:99px;background:var(--acc-light);color:var(--acc-text);white-space:nowrap;font-weight:500;flex-shrink:0}</p>
+<p class="p1">.entry-info{flex:1;min-width:0}</p>
+<p class="p1">.entry-memo{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}</p>
+<p class="p1">.entry-date{font-size:11px;color:#9ab0a0;margin-top:2px}</p>
+<p class="p1">.entry-amount{font-size:15px;font-weight:600;white-space:nowrap}</p>
+<p class="p1">.icon-btn{background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;color:#b8cfc0}</p>
+<p class="p1">.icon-btn:hover{color:var(--g1)}</p>
+<p class="p1">.icon-btn.del:hover{color:#e05252}</p>
+<p class="p1">.icon-btn svg{width:15px;height:15px;stroke-width:2}</p>
+<p class="p2"><br></p>
+<p class="p1">.btn-primary{width:100%;padding:13px;background:var(--g1);color:#fff;border:none;border-radius:12px;font-size:15px;cursor:pointer;font-weight:600;margin-top:10px;box-shadow:0 2px 8px rgba(30,122,74,.3);display:flex;align-items:center;justify-content:center;gap:6px}</p>
+<p class="p1">.btn-primary:active{opacity:.85}</p>
+<p class="p1">.btn-ghost{width:100%;padding:11px;background:#f0f4f1;color:#4a7a58;border:none;border-radius:10px;font-size:14px;cursor:pointer;font-weight:500;margin-top:6px}</p>
+<p class="p1">.btn-sm{padding:10px 16px;background:var(--g1);color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600}</p>
+<p class="p2"><br></p>
+<p class="p1">.hint-text{font-size:12px;color:#9ab0a0;margin-bottom:8px;text-align:center;line-height:1.6}</p>
+<p class="p1">.memo-textarea{width:100%;border:1.5px solid #d6e8dc;border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;color:#1a2e1e;background:#f7faf8;resize:none;height:110px}</p>
+<p class="p1">.memo-textarea:focus{outline:none;border-color:var(--g1);background:#fff}</p>
+<p class="p2"><br></p>
+<p class="p1">table{width:100%;border-collapse:collapse;font-size:13px}</p>
+<p class="p1">thead tr{border-bottom:1.5px solid #e6f0e9}</p>
+<p class="p1">th{text-align:left;padding:6px 4px;font-weight:600;color:#9ab0a0;font-size:11px;text-transform:uppercase;letter-spacing:.3px}</p>
+<p class="p1">tbody tr{border-bottom:1px solid #f0f4f1}</p>
+<p class="p1">tbody tr:last-child{border-bottom:none}</p>
+<p class="p1">td{padding:9px 4px;vertical-align:middle}</p>
+<p class="p2"><br></p>
+<p class="p1">.legend-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}</p>
+<p class="p1">.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#4a7a58}</p>
+<p class="p1">.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}</p>
+<p class="p2"><br></p>
+<p class="p1">.setting-label{font-size:13px;color:#4a7a58;margin-bottom:6px;font-weight:500}</p>
+<p class="p1">.setting-input{width:100%;padding:10px 12px;border:1.5px solid #d6e8dc;border-radius:10px;font-size:15px;background:#f7faf8;color:#1a2e1e}</p>
+<p class="p1">.setting-input:focus{outline:none;border-color:var(--g1);background:#fff}</p>
+<p class="p1">.cat-list{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 12px}</p>
+<p class="p1">.cat-chip{display:flex;align-items:center;gap:5px;background:#f0f4f1;border-radius:99px;padding:5px 10px 5px 12px;font-size:13px;font-weight:500}</p>
+<p class="p1">.cat-chip .chip-del{background:none;border:none;cursor:pointer;color:#9ab0a0;display:flex;align-items:center;padding:1px}</p>
+<p class="p1">.cat-chip .chip-del svg{width:13px;height:13px;stroke-width:2.5}</p>
+<p class="p1">.add-row{display:flex;gap:8px;margin-bottom:10px}</p>
+<p class="p1">.add-row input{flex:1;padding:10px 12px;border:1.5px solid #d6e8dc;border-radius:10px;font-size:14px;background:#f7faf8;color:#1a2e1e}</p>
+<p class="p1">.add-row input:focus{outline:none;border-color:var(--g1);background:#fff}</p>
+<p class="p1">.divider{height:1px;background:#f0f4f1;margin:12px 0}</p>
+<p class="p1">.empty{text-align:center;padding:24px;color:#9ab0a0;font-size:13px}</p>
+<p class="p1">.fixed-form{display:flex;flex-direction:column;gap:8px}</p>
+<p class="p1">.fixed-form input,.fixed-form select{padding:10px 12px;border:1.5px solid #d6e8dc;border-radius:10px;font-size:14px;background:#f7faf8;color:#1a2e1e;font-family:inherit}</p>
+<p class="p1">.fixed-form input:focus,.fixed-form select:focus{outline:none;border-color:var(--g1);background:#fff}</p>
+<p class="p2"><br></p>
+<p class="p1">/* モーダル */</p>
+<p class="p1">.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-end;justify-content:center}</p>
+<p class="p1">.modal-overlay.open{display:flex}</p>
+<p class="p1">.modal{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 36px;width:100%;max-width:480px}</p>
+<p class="p1">.modal h3{font-size:17px;font-weight:700;margin-bottom:16px}</p>
+<p class="p1">.modal-field{margin-bottom:12px}</p>
+<p class="p1">.modal-field label{font-size:12px;color:#9ab0a0;font-weight:600;letter-spacing:.3px;text-transform:uppercase;display:block;margin-bottom:5px}</p>
+<p class="p1">.modal-field input,.modal-field select{width:100%;padding:10px 12px;border:1.5px solid #d6e8dc;border-radius:10px;font-size:15px;background:#f7faf8;color:#1a2e1e;font-family:inherit}</p>
+<p class="p1">.modal-field input:focus,.modal-field select:focus{outline:none;border-color:var(--g1);background:#fff}</p>
+<p class="p1">.modal-actions{display:flex;gap:8px;margin-top:16px}</p>
+<p class="p1">.modal-actions button{flex:1;padding:12px;border:none;border-radius:12px;font-size:15px;cursor:pointer;font-weight:600}</p>
+<p class="p1">.modal-cancel{background:#f0f4f1;color:#4a7a58}</p>
+<p class="p1">.modal-save{background:var(--g1);color:#fff}</p>
+<p class="p2"><br></p>
+<p class="p1">/* ピッカー */</p>
+<p class="p1">.picker-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:flex-end;justify-content:center}</p>
+<p class="p1">.picker-overlay.open{display:flex}</p>
+<p class="p1">.picker-sheet{background:#fff;border-radius:20px 20px 0 0;padding:20px 20px 36px;width:100%;max-width:480px}</p>
+<p class="p1">.picker-sheet h3{font-size:17px;font-weight:700;margin-bottom:16px;text-align:center}</p>
+<p class="p1">.picker-year-nav{display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:16px}</p>
+<p class="p1">.picker-year-nav button{background:var(--acc-light);border:none;cursor:pointer;color:var(--g1);padding:4px 14px;border-radius:8px;font-size:22px;line-height:1}</p>
+<p class="p1">.picker-year-label{font-size:18px;font-weight:700;min-width:80px;text-align:center}</p>
+<p class="p1">.picker-months{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}</p>
+<p class="p1">.picker-month-btn{padding:12px 4px;border:1.5px solid #d6e8dc;border-radius:10px;background:#f7faf8;font-size:14px;font-weight:500;cursor:pointer;color:#1a2e1e;transition:all .15s}</p>
+<p class="p1">.picker-month-btn.selected{background:var(--g1);color:#fff;border-color:var(--g1)}</p>
+<p class="p1">.picker-month-btn:hover:not(.selected){background:var(--acc-light);border-color:var(--g1)}</p>
+<p class="p2"><br></p>
+<p class="p1">.budget-month-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0f4f1}</p>
+<p class="p1">.budget-month-row:last-child{border-bottom:none}</p>
+<p class="p1">.budget-month-row .ml{font-size:14px;font-weight:500}</p>
+<p class="p1">.budget-month-row .mi{width:130px;padding:7px 10px;border:1.5px solid #d6e8dc;border-radius:8px;font-size:14px;background:#f7faf8;color:#1a2e1e;text-align:right}</p>
+<p class="p1">.budget-month-row .mi:focus{outline:none;border-color:var(--g1);background:#fff}</p>
+<p class="p1">&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;!-- 家計簿タブ --&gt;</p>
+<p class="p1">&lt;div id="page-dash" class="page active"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="page-header"&gt;家計簿&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="month-selector"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="month-nav" onclick="changeMonth(-1,'dash')"&gt;&lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor"&gt;&lt;polyline points="15 18 9 12 15 6"/&gt;&lt;/svg&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="month-label-btn" id="dash-month-label" onclick="openPicker('dash')"&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="month-nav" onclick="changeMonth(1,'dash')"&gt;&lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor"&gt;&lt;polyline points="9 18 15 12 9 6"/&gt;&lt;/svg&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div style="display:flex;justify-content:flex-end;margin-bottom:10px"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="view-toggle" id="view-toggle" onclick="toggleView()"&gt;年間ビュー&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="dash-content"&gt;&lt;/div&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;!-- 入力タブ --&gt;</p>
+<p class="p1">&lt;div id="page-memo" class="page"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="page-header"&gt;入力&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="grad-card green"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="lbl"&gt;今月の残高&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="big" id="top-bal-amount"&gt;¥0&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="sub"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="sub-item"&gt;&lt;div class="sl"&gt;予算&lt;/div&gt;&lt;div class="sv" id="top-budget"&gt;¥0&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="sub-item"&gt;&lt;div class="sl"&gt;今月の支出&lt;/div&gt;&lt;div class="sv" id="top-spent"&gt;¥0&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card-header"&gt;支出を追加&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card-body"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style="display:flex;flex-direction:column;align-items:center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="hint-text"&gt;「5/6 コンビニ 980」のように&lt;br&gt;日付・内容・金額を自由に入力&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;textarea class="memo-textarea" id="memo-input" placeholder="例: 5/6 コンビニ 980&amp;#10;交通費 220&amp;#10;5月12日 ランチ 1200"&gt;&lt;/textarea&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn-primary" onclick="parseMemo()"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"&gt;&lt;line x1="12" y1="5" x2="12" y2="19"/&gt;&lt;line x1="5" y1="12" x2="19" y2="12"/&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>追加する</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card-header" style="padding-bottom:10px"&gt;今月の履歴&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card-body" style="padding-top:4px"&gt;&lt;div id="entry-list"&gt;&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;!-- 固定費タブ --&gt;</p>
+<p class="p1">&lt;div id="page-fixed" class="page"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="page-header"&gt;固定費&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="month-selector"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="month-nav" onclick="changeMonth(-1,'fixed')"&gt;&lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor"&gt;&lt;polyline points="15 18 9 12 15 6"/&gt;&lt;/svg&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="month-label-btn" id="fixed-month-label" onclick="openPicker('fixed')"&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="month-nav" onclick="changeMonth(1,'fixed')"&gt;&lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor"&gt;&lt;polyline points="9 18 15 12 9 6"/&gt;&lt;/svg&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="fixed-content"&gt;&lt;/div&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;!-- 設定タブ --&gt;</p>
+<p class="p1">&lt;div id="page-settings" class="page"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="page-header"&gt;設定&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card-header"&gt;月別予算設定&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card-body"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="setting-label"&gt;デフォルト予算（未設定の月に適用）&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;input type="number" class="setting-input" id="default-budget-input" placeholder="例: 150000"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="btn-primary" onclick="saveDefaultBudget()" style="margin-top:10px"&gt;デフォルト予算を保存&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="divider"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="setting-label"&gt;月ごとの予算（空欄=デフォルト適用）&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="monthly-budget-list"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card-header"&gt;カテゴリ管理&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card-body"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="cat-list" id="cat-list"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="add-row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="text" id="new-cat-input" placeholder="新しいカテゴリ名"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn-sm" onclick="addCategory()"&gt;追加&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="divider"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="btn-ghost" onclick="resetCategories()"&gt;デフォルトに戻す&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;!-- タブバー --&gt;</p>
+<p class="p1">&lt;nav class="tab-bar"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;button class="tab-btn active" id="tab-memo" onclick="switchTab('memo')"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;span class="tab-icon"&gt;&lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor"&gt;&lt;line x1="12" y1="5" x2="12" y2="19"/&gt;&lt;line x1="5" y1="12" x2="19" y2="12"/&gt;&lt;/svg&gt;&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>入力</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;button class="tab-btn" id="tab-dash" onclick="switchTab('dash')"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;span class="tab-icon"&gt;&lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor"&gt;&lt;rect x="3" y="3" width="7" height="7" rx="1.5"/&gt;&lt;rect x="14" y="3" width="7" height="7" rx="1.5"/&gt;&lt;rect x="3" y="14" width="7" height="7" rx="1.5"/&gt;&lt;rect x="14" y="14" width="7" height="7" rx="1.5"/&gt;&lt;/svg&gt;&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>家計簿</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;button class="tab-btn" id="tab-fixed" onclick="switchTab('fixed')"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;span class="tab-icon"&gt;&lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor"&gt;&lt;rect x="2" y="5" width="20" height="14" rx="2"/&gt;&lt;line x1="2" y1="10" x2="22" y2="10"/&gt;&lt;/svg&gt;&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>固定費</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;button class="tab-btn" id="tab-settings" onclick="switchTab('settings')"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;span class="tab-icon"&gt;&lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor"&gt;&lt;circle cx="12" cy="12" r="3"/&gt;&lt;path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/&gt;&lt;/svg&gt;&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>設定</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/button&gt;</p>
+<p class="p1">&lt;/nav&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;!-- 年月ピッカー --&gt;</p>
+<p class="p1">&lt;div class="picker-overlay" id="picker-overlay"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="picker-sheet"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h3&gt;年月を選択&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="picker-year-nav"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button onclick="pickerChangeYear(-1)"&gt;&amp;#8249;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;span class="picker-year-label" id="picker-year-label"&gt;&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button onclick="pickerChangeYear(1)"&gt;&amp;#8250;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="picker-months" id="picker-months"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="btn-ghost" onclick="closePicker()"&gt;キャンセル&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;!-- 編集モーダル --&gt;</p>
+<p class="p1">&lt;div class="modal-overlay" id="edit-modal"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="modal"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h3&gt;支出を編集&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-field"&gt;&lt;label&gt;日付&lt;/label&gt;&lt;input type="date" id="edit-date"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-field"&gt;&lt;label&gt;内容&lt;/label&gt;&lt;input type="text" id="edit-memo" placeholder="例: コンビニ"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-field"&gt;&lt;label&gt;金額&lt;/label&gt;&lt;input type="number" id="edit-amount" placeholder="例: 980"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-field"&gt;&lt;label&gt;カテゴリ&lt;/label&gt;&lt;select id="edit-category"&gt;&lt;/select&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-actions"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="modal-cancel" onclick="closeEditModal()"&gt;キャンセル&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="modal-save" onclick="saveEdit()"&gt;保存&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;!-- 固定費編集モーダル --&gt;</p>
+<p class="p1">&lt;div class="modal-overlay" id="fixed-edit-modal"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="modal"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h3&gt;固定費を編集&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-field"&gt;&lt;label&gt;名前&lt;/label&gt;&lt;input type="text" id="fedit-name" placeholder="例: 家賃"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-field"&gt;&lt;label&gt;金額&lt;/label&gt;&lt;input type="number" id="fedit-amount" placeholder="例: 70000"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-field"&gt;&lt;label&gt;カテゴリ&lt;/label&gt;&lt;select id="fedit-category"&gt;&lt;/select&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="modal-actions"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="modal-cancel" onclick="closeFixedEditModal()"&gt;キャンセル&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="modal-save" onclick="saveFixedEdit()"&gt;保存&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1">const SK='kakeibo_v4';</p>
+<p class="p1">const DEFAULT_CATS=['食費','交通費','日用品','娯楽','外食','医療','衣類','その他'];</p>
+<p class="p1">const CAT_COLORS=['#1e7a4a','#2a9d6e','#D85A30','#D4537E','#639922','#BA7517','#533AB7','#73726c'];</p>
+<p class="p1">let state={defaultBudget:0,monthlyBudgets:{},categories:[...DEFAULT_CATS],entries:[],fixedItems:{}};</p>
+<p class="p1">renderEntries();updateTopBalance();</p>
+<p class="p1">let dashM=new Date().getMonth(),dashY=new Date().getFullYear();</p>
+<p class="p1">let fixedM=new Date().getMonth(),fixedY=new Date().getFullYear();</p>
+<p class="p1">let isYearView=false;</p>
+<p class="p1">let pieChart=null,barChart=null,fixedPieChart=null;</p>
+<p class="p1">let editingId=null,editingFixedId=null;</p>
+<p class="p1">let pickerTarget=null,pickerY=new Date().getFullYear();</p>
+<p class="p1">let settingsBudgetYear=new Date().getFullYear();</p>
+<p class="p2"><br></p>
+<p class="p1">function load(){try{const d=localStorage.getItem(SK);if(d)state=JSON.parse(d);}catch(e){}}</p>
+<p class="p1">function save(){try{localStorage.setItem(SK,JSON.stringify(state));}catch(e){}}</p>
+<p class="p1">load();</p>
+<p class="p2"><br></p>
+<p class="p1">function switchTab(t){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>['dash','memo','fixed','settings'].forEach(x=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('page-'+x).classList.remove('active');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('tab-'+x).classList.remove('active');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('page-'+t).classList.add('active');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('tab-'+t).classList.add('active');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(t==='dash')renderDash();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(t==='memo'){renderEntries();updateTopBalance();}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(t==='fixed')renderFixed();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(t==='settings')renderSettings();</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function changeMonth(d,page){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(page==='dash'){dashM+=d;if(dashM&gt;11){dashM=0;dashY++;}if(dashM&lt;0){dashM=11;dashY--;}renderDash();}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>else{fixedM+=d;if(fixedM&gt;11){fixedM=0;fixedY++;}if(fixedM&lt;0){fixedM=11;fixedY--;}renderFixed();}</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// ── ピッカー ──</p>
+<p class="p1">function openPicker(target){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>pickerTarget=target;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>pickerY=target==='dash'?dashY:fixedY;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>renderPickerSheet();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('picker-overlay').classList.add('open');</p>
+<p class="p1">}</p>
+<p class="p1">function closePicker(){document.getElementById('picker-overlay').classList.remove('open');pickerTarget=null;}</p>
+<p class="p1">function pickerChangeYear(d){pickerY+=d;renderPickerSheet();}</p>
+<p class="p1">function renderPickerSheet(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('picker-year-label').textContent=pickerY+'年';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const curM=pickerTarget==='dash'?dashM:fixedM;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const curY=pickerTarget==='dash'?dashY:fixedY;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('picker-months').innerHTML=Array.from({length:12},(_,i)=&gt;`</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button class="picker-month-btn${pickerY===curY&amp;&amp;i===curM?' selected':''}" onclick="selectPickerMonth(${i})"&gt;${i+1}月&lt;/button&gt;`).join('');</p>
+<p class="p1">}</p>
+<p class="p1">function selectPickerMonth(m){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(pickerTarget==='dash'){dashY=pickerY;dashM=m;renderDash();}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>else{fixedY=pickerY;fixedM=m;renderFixed();}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>closePicker();</p>
+<p class="p1">}</p>
+<p class="p1">document.getElementById('picker-overlay').addEventListener('click',e=&gt;{if(e.target===document.getElementById('picker-overlay'))closePicker();});</p>
+<p class="p2"><br></p>
+<p class="p1">// ── 予算 ──</p>
+<p class="p1">function getBudget(y,m){return state.monthlyBudgets[`${y}-${m}`]??state.defaultBudget;}</p>
+<p class="p2"><br></p>
+<p class="p1">// ── 残高（入力タブ） ──</p>
+<p class="p1">function nowEntries(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const n=new Date();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return state.entries.filter(e=&gt;{const d=new Date(e.date);return d.getFullYear()===n.getFullYear()&amp;&amp;d.getMonth()===n.getMonth();});</p>
+<p class="p1">}</p>
+<p class="p1">function totalSpent(arr){return arr.reduce((s,e)=&gt;s+e.amount,0);}</p>
+<p class="p1">function updateTopBalance(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const n=new Date(),y=n.getFullYear(),m=n.getMonth();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const spent=totalSpent(nowEntries());</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const bud=getBudget(y,m);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const bal=bud-spent;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const el=document.getElementById('top-bal-amount');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>el.textContent='¥'+bal.toLocaleString();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>el.style.color=bal&lt;0?'#fca5a5':bal&lt;bud*0.2?'#fcd34d':'#fff';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('top-budget').textContent='¥'+bud.toLocaleString();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('top-spent').textContent='¥'+spent.toLocaleString();</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// ── メモ解析 ──</p>
+<p class="p1">function parseMemo(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const raw=document.getElementById('memo-input').value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!raw)return;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const lines=raw.split('\n').filter(l=&gt;l.trim());</p>
+<p class="p1"><span class="Apple-converted-space">  </span>let added=0;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>lines.forEach(line=&gt;{const e=parseLine(line.trim());if(e){state.entries.unshift(e);added++;}});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(added&gt;0){save();document.getElementById('memo-input').value='';renderEntries();updateTopBalance();}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>else alert('入力を認識できませんでした。\n例: 5/6 コンビニ 980');</p>
+<p class="p1">}</p>
+<p class="p1">function parseLine(line){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const now=new Date();let date=now.toISOString().split('T')[0],text=line;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const ps=[</p>
+<p class="p1"><span class="Apple-converted-space">    </span>{r:/^(\d{1,2})[\/月](\d{1,2})日?\s+/,fn:m=&gt;`${now.getFullYear()}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>{r:/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})\s+/,fn:m=&gt;`${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>{r:/^(\d{1,2})日\s+/,fn:m=&gt;`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${m[1].padStart(2,'0')}`}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>for(const p of ps){const m=text.match(p.r);if(m){date=p.fn(m);text=text.slice(m[0].length);break;}}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const am=text.match(/[,，]?\s*(\d[\d,，]*)\s*円?$/);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!am)return null;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const amount=parseInt(am[1].replace(/[,，]/g,''));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const memo=text.slice(0,text.lastIndexOf(am[0])).trim()||text;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return{id:Date.now()+Math.random(),date,memo,amount,category:guessCategory(memo)};</p>
+<p class="p1">}</p>
+<p class="p1">const KW={食費:['スーパー','食料','食品','米','野菜','肉','魚','お菓子','コーヒー'],交通費:['電車','バス','タクシー','交通','suica','pasmo','定期','新幹線'],外食:['ランチ','ディナー','コンビニ','カフェ','レストラン','食事','飲み','ラーメン','寿司','焼肉','居酒屋','マック','スタバ'],日用品:['日用品','ドラッグ','薬局','シャンプー','洗剤','消耗品'],娯楽:['映画','ゲーム','本','漫画','音楽','動画','netflix','spotify'],医療:['病院','クリニック','薬','医療','歯医者'],衣類:['服','靴','洋服','ユニクロ','zara','アパレル']};</p>
+<p class="p1">function guessCategory(memo){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const l=memo.toLowerCase();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>for(const[cat,kws]of Object.entries(KW)){if(state.categories.includes(cat)&amp;&amp;kws.some(k=&gt;l.includes(k)))return cat;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return state.categories[state.categories.length-1]||'その他';</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function icoEdit(){return`&lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"&gt;&lt;path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/&gt;&lt;path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/&gt;&lt;/svg&gt;`;}</p>
+<p class="p1">function icoDel(){return`&lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"&gt;&lt;polyline points="3 6 5 6 21 6"/&gt;&lt;path d="M19 6l-1 14H6L5 6"/&gt;&lt;path d="M10 11v6M14 11v6"/&gt;&lt;path d="M9 6V4h6v2"/&gt;&lt;/svg&gt;`;}</p>
+<p class="p2"><br></p>
+<p class="p1">// ── 入力タブ ──</p>
+<p class="p1">function renderEntries(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const entries=nowEntries();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const el=document.getElementById('entry-list');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!entries.length){el.innerHTML='&lt;div class="empty"&gt;今月の記録はまだありません&lt;/div&gt;';return;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>el.innerHTML=entries.map(e=&gt;`</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="entry-item"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;span class="cat-badge"&gt;${e.category}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="entry-info"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="entry-memo"&gt;${e.memo}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="entry-date"&gt;${fmtDate(e.date)}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;span class="entry-amount"&gt;¥${e.amount.toLocaleString()}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="icon-btn" onclick="openEditModal('${e.id}')"&gt;${icoEdit()}&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="icon-btn del" onclick="deleteEntry('${e.id}')"&gt;${icoDel()}&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;`).join('');</p>
+<p class="p1">}</p>
+<p class="p1">function deleteEntry(id){state.entries=state.entries.filter(e=&gt;String(e.id)!==String(id));save();renderEntries();updateTopBalance();}</p>
+<p class="p1">function fmtDate(d){const dt=new Date(d);return`${dt.getMonth()+1}月${dt.getDate()}日`;}</p>
+<p class="p2"><br></p>
+<p class="p1">// ── 編集モーダル ──</p>
+<p class="p1">function openEditModal(id){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const e=state.entries.find(x=&gt;String(x.id)===String(id));if(!e)return;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>editingId=id;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('edit-date').value=e.date;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('edit-memo').value=e.memo;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('edit-amount').value=e.amount;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('edit-category').innerHTML=state.categories.map(c=&gt;`&lt;option value="${c}"${c===e.category?' selected':''}&gt;${c}&lt;/option&gt;`).join('');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('edit-modal').classList.add('open');</p>
+<p class="p1">}</p>
+<p class="p1">function closeEditModal(){document.getElementById('edit-modal').classList.remove('open');editingId=null;}</p>
+<p class="p1">function saveEdit(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const e=state.entries.find(x=&gt;String(x.id)===String(editingId));if(!e)return;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>e.date=document.getElementById('edit-date').value;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>e.memo=document.getElementById('edit-memo').value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>e.amount=parseInt(document.getElementById('edit-amount').value)||0;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>e.category=document.getElementById('edit-category').value;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>save();closeEditModal();renderEntries();updateTopBalance();</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// ── ダッシュボード ──</p>
+<p class="p1">function toggleView(){isYearView=!isYearView;document.getElementById('view-toggle').textContent=isYearView?'月間ビュー':'年間ビュー';renderDash();}</p>
+<p class="p1">function renderDash(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('dash-month-label').textContent=`${dashY}年${dashM+1}月`;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>isYearView?renderYearView():renderMonthView();</p>
+<p class="p1">}</p>
+<p class="p1">function renderMonthView(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const entries=state.entries.filter(e=&gt;{const d=new Date(e.date);return d.getFullYear()===dashY&amp;&amp;d.getMonth()===dashM;});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const spent=totalSpent(entries);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const bud=getBudget(dashY,dashM);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const bal=bud-spent;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const balColor=bal&lt;0?'#fca5a5':bal&lt;bud*0.2?'#fcd34d':'#fff';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const catTotals={};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>entries.forEach(e=&gt;{catTotals[e.category]=(catTotals[e.category]||0)+e.amount;});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const cats=Object.keys(catTotals).sort((a,b)=&gt;catTotals[b]-catTotals[a]);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const legend=cats.map((c,i)=&gt;`&lt;span class="legend-item"&gt;&lt;span class="legend-dot" style="background:${CAT_COLORS[i%CAT_COLORS.length]}"&gt;&lt;/span&gt;${c} ¥${catTotals[c].toLocaleString()}&lt;/span&gt;`).join('');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('dash-content').innerHTML=`</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="grad-card green"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="lbl"&gt;${dashY}年${dashM+1}月 残高&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="big" style="color:${balColor}"&gt;¥${bal.toLocaleString()}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="sub"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="sub-item"&gt;&lt;div class="sl"&gt;予算&lt;/div&gt;&lt;div class="sv"&gt;¥${bud.toLocaleString()}&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="sub-item"&gt;&lt;div class="sl"&gt;支出&lt;/div&gt;&lt;div class="sv"&gt;¥${spent.toLocaleString()}&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card"&gt;&lt;div class="card-header"&gt;支出一覧&lt;/div&gt;&lt;div class="card-body"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>${entries.length?`&lt;div style="overflow-x:auto"&gt;&lt;table&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;colgroup&gt;&lt;col style="width:20%"&gt;&lt;col style="width:30%"&gt;&lt;col style="width:22%"&gt;&lt;col style="width:28%"&gt;&lt;/colgroup&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;thead&gt;&lt;tr&gt;&lt;th&gt;日付&lt;/th&gt;&lt;th&gt;内容&lt;/th&gt;&lt;th style="text-align:right"&gt;金額&lt;/th&gt;&lt;th style="text-align:center"&gt;カテゴリ&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;tbody&gt;${entries.map(e=&gt;`&lt;tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td style="color:#9ab0a0"&gt;${fmtDate(e.date)}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0"&gt;${e.memo}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td style="text-align:right;font-weight:600"&gt;¥${e.amount.toLocaleString()}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;td style="text-align:center"&gt;&lt;span class="cat-badge"&gt;${e.category}&lt;/span&gt;&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/tr&gt;`).join('')}&lt;/tbody&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/table&gt;&lt;/div&gt;`:'&lt;div class="empty"&gt;データなし&lt;/div&gt;'}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card"&gt;&lt;div class="card-header"&gt;カテゴリ別支出&lt;/div&gt;&lt;div class="card-body"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>${cats.length?`&lt;div class="legend-row"&gt;${legend}&lt;/div&gt;&lt;div style="position:relative;height:220px"&gt;&lt;canvas id="pie-chart"&gt;&lt;/canvas&gt;&lt;/div&gt;`:'&lt;div class="empty"&gt;データなし&lt;/div&gt;'}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;&lt;/div&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(cats.length){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if(pieChart){pieChart.destroy();pieChart=null;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>pieChart=new Chart(document.getElementById('pie-chart'),{type:'doughnut',data:{labels:cats,datasets:[{data:cats.map(c=&gt;catTotals[c]),backgroundColor:cats.map((_,i)=&gt;CAT_COLORS[i%CAT_COLORS.length]),borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'60%'}});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1">}</p>
+<p class="p1">function renderYearView(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const months=Array.from({length:12},(_,i)=&gt;i);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const data=months.map(m=&gt;totalSpent(state.entries.filter(e=&gt;{const d=new Date(e.date);return d.getFullYear()===dashY&amp;&amp;d.getMonth()===m;})));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const yearTotal=data.reduce((s,v)=&gt;s+v,0);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('dash-content').innerHTML=`</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="grad-card green"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="lbl"&gt;${dashY}年 年間支出合計&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="big"&gt;¥${yearTotal.toLocaleString()}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="sub"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="sub-item"&gt;&lt;div class="sl"&gt;月平均&lt;/div&gt;&lt;div class="sv"&gt;¥${Math.round(yearTotal/12).toLocaleString()}&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="sub-item"&gt;&lt;div class="sl"&gt;年間予算&lt;/div&gt;&lt;div class="sv"&gt;¥${(state.defaultBudget*12).toLocaleString()}&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card"&gt;&lt;div class="card-header"&gt;月別支出推移&lt;/div&gt;&lt;div class="card-body"&gt;&lt;div style="position:relative;height:240px"&gt;&lt;canvas id="bar-chart"&gt;&lt;/canvas&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(barChart){barChart.destroy();barChart=null;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>barChart=new Chart(document.getElementById('bar-chart'),{type:'bar',data:{labels:months.map(m=&gt;`${m+1}月`),datasets:[{data,backgroundColor:'#1e7a4a55',borderColor:'#1e7a4a',borderWidth:1.5,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:11},maxRotation:0}},y:{ticks:{callback:v=&gt;'¥'+v.toLocaleString(),font:{size:10}}}}}});</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// ── 固定費 ──</p>
+<p class="p1">function fixedKey(y,m){return`${y}-${String(m+1).padStart(2,'0')}`;}</p>
+<p class="p1">function getFixedItems(y,m){return state.fixedItems[fixedKey(y,m)]||[];}</p>
+<p class="p1">function renderFixed(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('fixed-month-label').textContent=`${fixedY}年${fixedM+1}月`;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const items=getFixedItems(fixedY,fixedM);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const total=items.reduce((s,i)=&gt;s+i.amount,0);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const catTotals={};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>items.forEach(i=&gt;{catTotals[i.category]=(catTotals[i.category]||0)+i.amount;});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const cats=Object.keys(catTotals).sort((a,b)=&gt;catTotals[b]-catTotals[a]);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const legend=cats.map((c,i)=&gt;`&lt;span class="legend-item"&gt;&lt;span class="legend-dot" style="background:${CAT_COLORS[i%CAT_COLORS.length]}"&gt;&lt;/span&gt;${c} ¥${catTotals[c].toLocaleString()}&lt;/span&gt;`).join('');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const prevKey=fixedM===0?`${fixedY-1}-12`:`${fixedY}-${String(fixedM).padStart(2,'0')}`;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const hasPrev=(state.fixedItems[prevKey]||[]).length&gt;0;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const catOpts=state.categories.map(c=&gt;`&lt;option value="${c}"&gt;${c}&lt;/option&gt;`).join('');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('fixed-content').innerHTML=`</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="grad-card teal"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="lbl"&gt;${fixedY}年${fixedM+1}月 固定費合計&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="big"&gt;¥${total.toLocaleString()}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card"&gt;&lt;div class="card-header"&gt;カテゴリ別固定費&lt;/div&gt;&lt;div class="card-body"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>${cats.length?`&lt;div class="legend-row"&gt;${legend}&lt;/div&gt;&lt;div style="position:relative;height:200px"&gt;&lt;canvas id="fixed-pie"&gt;&lt;/canvas&gt;&lt;/div&gt;`:'&lt;div class="empty"&gt;データなし&lt;/div&gt;'}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card"&gt;&lt;div class="card-header"&gt;固定費一覧&lt;/div&gt;&lt;div class="card-body"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>${items.length?items.map(it=&gt;`</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="entry-item"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;span class="cat-badge"&gt;${it.category}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="entry-info"&gt;&lt;div class="entry-memo"&gt;${it.name}&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;span class="entry-amount"&gt;¥${it.amount.toLocaleString()}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button class="icon-btn" onclick="openFixedEditModal('${it.id}')"&gt;${icoEdit()}&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button class="icon-btn del" onclick="deleteFixedItem('${it.id}')"&gt;${icoDel()}&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;`).join(''):'&lt;div class="empty"&gt;固定費はまだありません&lt;/div&gt;'}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card"&gt;&lt;div class="card-header"&gt;固定費を追加&lt;/div&gt;&lt;div class="card-body"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="fixed-form"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="text" id="fi-name" placeholder="名前（例: 家賃）"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="number" id="fi-amount" placeholder="金額（例: 70000）"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;select id="fi-cat"&gt;${catOpts}&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="btn-primary" onclick="addFixedItem()"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"&gt;&lt;line x1="12" y1="5" x2="12" y2="19"/&gt;&lt;line x1="5" y1="12" x2="19" y2="12"/&gt;&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>追加する</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>${hasPrev?`&lt;button class="btn-ghost" onclick="copyPrevMonth()"&gt;先月からコピー&lt;/button&gt;`:''}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;&lt;/div&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(cats.length){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if(fixedPieChart){fixedPieChart.destroy();fixedPieChart=null;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>fixedPieChart=new Chart(document.getElementById('fixed-pie'),{type:'doughnut',data:{labels:cats,datasets:[{data:cats.map(c=&gt;catTotals[c]),backgroundColor:cats.map((_,i)=&gt;CAT_COLORS[i%CAT_COLORS.length]),borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'60%'}});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1">}</p>
+<p class="p1">function addFixedItem(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const name=document.getElementById('fi-name').value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const amount=parseInt(document.getElementById('fi-amount').value)||0;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const category=document.getElementById('fi-cat').value;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!name||!amount)return alert('名前と金額を入力してください');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const k=fixedKey(fixedY,fixedM);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!state.fixedItems[k])state.fixedItems[k]=[];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.fixedItems[k].push({id:Date.now()+Math.random(),name,amount,category});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>save();renderFixed();</p>
+<p class="p1">}</p>
+<p class="p1">function deleteFixedItem(id){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const k=fixedKey(fixedY,fixedM);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.fixedItems[k]=(state.fixedItems[k]||[]).filter(i=&gt;String(i.id)!==String(id));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>save();renderFixed();</p>
+<p class="p1">}</p>
+<p class="p1">function copyPrevMonth(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const prevK=fixedM===0?`${fixedY-1}-12`:`${fixedY}-${String(fixedM).padStart(2,'0')}`;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const prev=state.fixedItems[prevK]||[];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!prev.length)return;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const k=fixedKey(fixedY,fixedM);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>state.fixedItems[k]=prev.map(i=&gt;({...i,id:Date.now()+Math.random()}));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>save();renderFixed();</p>
+<p class="p1">}</p>
+<p class="p1">function openFixedEditModal(id){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const k=fixedKey(fixedY,fixedM);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const it=(state.fixedItems[k]||[]).find(x=&gt;String(x.id)===String(id));if(!it)return;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>editingFixedId=id;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('fedit-name').value=it.name;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('fedit-amount').value=it.amount;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('fedit-category').innerHTML=state.categories.map(c=&gt;`&lt;option value="${c}"${c===it.category?' selected':''}&gt;${c}&lt;/option&gt;`).join('');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('fixed-edit-modal').classList.add('open');</p>
+<p class="p1">}</p>
+<p class="p1">function closeFixedEditModal(){document.getElementById('fixed-edit-modal').classList.remove('open');editingFixedId=null;}</p>
+<p class="p1">function saveFixedEdit(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const k=fixedKey(fixedY,fixedM);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const it=(state.fixedItems[k]||[]).find(x=&gt;String(x.id)===String(editingFixedId));if(!it)return;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>it.name=document.getElementById('fedit-name').value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>it.amount=parseInt(document.getElementById('fedit-amount').value)||0;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>it.category=document.getElementById('fedit-category').value;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>save();closeFixedEditModal();renderFixed();</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// ── 設定 ──</p>
+<p class="p1">function renderSettings(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('default-budget-input').value=state.defaultBudget||'';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const months=Array.from({length:12},(_,i)=&gt;i);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('monthly-budget-list').innerHTML=`</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="month-nav" onclick="changeSettingsYear(-1)" style="border:1px solid #d6e8dc;border-radius:8px"&gt;&lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="20" height="20" stroke-width="2.2"&gt;&lt;polyline points="15 18 9 12 15 6"/&gt;&lt;/svg&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;span style="font-size:16px;font-weight:700"&gt;${settingsBudgetYear}年&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="month-nav" onclick="changeSettingsYear(1)" style="border:1px solid #d6e8dc;border-radius:8px"&gt;&lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="20" height="20" stroke-width="2.2"&gt;&lt;polyline points="9 18 15 12 9 6"/&gt;&lt;/svg&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>${months.map(m=&gt;`</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="budget-month-row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;span class="ml"&gt;${settingsBudgetYear}年${m+1}月&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;input class="mi" type="number" placeholder="${state.defaultBudget||'デフォルト'}" value="${state.monthlyBudgets[`${settingsBudgetYear}-${m}`]??''}" onchange="saveMonthlyBudget(${settingsBudgetYear},${m},this.value)"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;`).join('')}`;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById('cat-list').innerHTML=state.categories.map((c,i)=&gt;`</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;span class="cat-chip"&gt;${c}&lt;button class="chip-del" onclick="removeCategory(${i})"&gt;&lt;svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"&gt;&lt;line x1="18" y1="6" x2="6" y2="18"/&gt;&lt;line x1="6" y1="6" x2="18" y2="18"/&gt;&lt;/svg&gt;&lt;/button&gt;&lt;/span&gt;`).join('');</p>
+<p class="p1">}</p>
+<p class="p1">function changeSettingsYear(d){settingsBudgetYear+=d;renderSettings();}</p>
+<p class="p1">function saveDefaultBudget(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const v=parseInt(document.getElementById('default-budget-input').value);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!isNaN(v)&amp;&amp;v&gt;=0){state.defaultBudget=v;save();updateTopBalance();}</p>
+<p class="p1">}</p>
+<p class="p1">function saveMonthlyBudget(y,m,val){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const k=`${y}-${m}`;const v=parseInt(val);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(!isNaN(v)&amp;&amp;v&gt;0)state.monthlyBudgets[k]=v;else delete state.monthlyBudgets[k];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>save();updateTopBalance();</p>
+<p class="p1">}</p>
+<p class="p1">function addCategory(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const inp=document.getElementById('new-cat-input');const v=inp.value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(v&amp;&amp;!state.categories.includes(v)){state.categories.push(v);save();inp.value='';renderSettings();}</p>
+<p class="p1">}</p>
+<p class="p1">function removeCategory(i){if(state.categories.length&lt;=1)return;state.categories.splice(i,1);save();renderSettings();}</p>
+<p class="p1">function resetCategories(){if(confirm('カテゴリをデフォルトに戻しますか？')){state.categories=[...DEFAULT_CATS];save();renderSettings();}}</p>
+<p class="p2"><br></p>
+<p class="p1">document.querySelectorAll('.modal-overlay').forEach(el=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">  </span>el.addEventListener('click',e=&gt;{if(e.target===el){el.classList.remove('open');editingId=null;editingFixedId=null;}});</p>
+<p class="p1">});</p>
+<p class="p2"><br></p>
+<p class="p1">renderDash();</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
